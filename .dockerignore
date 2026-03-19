@@ -1,0 +1,17 @@
+**/.git
+**/.gitignore
+**/.vscode
+**/.idea
+**/node_modules
+**/venv
+**/env
+**/__pycache__
+**/.pytest_cache
+**/.next
+**/out
+**/build
+**/dist
+**/*.md
+**/LICENSE
+**/.env
+**/.env.local

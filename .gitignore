@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.cache/
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Database
+*.db
+*.sqlite3
+*.log
+
+# Docker
+*.env.docker
+
+# OS
+Thumbs.db
+.DS_Store
