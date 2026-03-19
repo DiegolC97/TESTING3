@@ -1,58 +1,43 @@
-.PHONY: help install dev-up dev-down clean test lint format
+.PHONY: help install dev-frontend dev-backend test clean docker-up docker-down
 
 help:
 	@echo "Available commands:"
-	@echo "  make install    - Install all dependencies"
-	@echo "  make dev-up     - Start development environment with Docker"
-	@echo "  make dev-down   - Stop development environment"
-	@echo "  make clean      - Clean all generated files"
-	@echo "  make test       - Run all tests"
-	@echo "  make lint       - Run linting checks"
-	@echo "  make format     - Format code"
+	@echo "  make install        - Install all dependencies"
+	@echo "  make dev-frontend   - Start frontend development server"
+	@echo "  make dev-backend    - Start backend development server"
+	@echo "  make test           - Run all tests"
+	@echo "  make docker-up      - Start all services with Docker Compose"
+	@echo "  make docker-down    - Stop all Docker services"
+	@echo "  make clean          - Clean build artifacts and caches"
 
 install:
 	@echo "Installing frontend dependencies..."
 	cd frontend && npm install
 	@echo "Installing backend dependencies..."
-	cd backend && pip install -r requirements.txt
+	cd backend && python -m venv venv && . venv/bin/activate && pip install -r requirements.txt
 	@echo "Dependencies installed!"
 
-dev-up:
-	@echo "Starting development environment..."
-	docker-compose up -d
-	@echo "Services started!"
-	@echo "Frontend: http://localhost:3000"
-	@echo "Backend: http://localhost:8000"
-	@echo "API Docs: http://localhost:8000/docs"
+dev-frontend:
+	cd frontend && npm run dev
 
-dev-down:
-	@echo "Stopping development environment..."
-	docker-compose down
-	@echo "Services stopped!"
-
-clean:
-	@echo "Cleaning generated files..."
-	rm -rf frontend/node_modules frontend/.next frontend/out
-	rm -rf backend/venv backend/__pycache__ backend/**/__pycache__
-	rm -rf backend/.pytest_cache backend/**/.pytest_cache
-	rm -f backend/test.db
-	@echo "Cleanup complete!"
+dev-backend:
+	cd backend && . venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 test:
 	@echo "Running backend tests..."
-	cd backend && pytest
-	@echo "Tests complete!"
+	cd backend && . venv/bin/activate && pytest
+	@echo "Running frontend tests..."
+	cd frontend && npm test
 
-lint:
-	@echo "Linting backend..."
-	cd backend && flake8 app
-	@echo "Linting frontend..."
-	cd frontend && npm run lint
-	@echo "Linting complete!"
+docker-up:
+	docker-compose up -d
 
-format:
-	@echo "Formatting backend code..."
-	cd backend && black . && isort .
-	@echo "Formatting frontend code..."
-	cd frontend && npm run format
-	@echo "Formatting complete!"
+docker-down:
+	docker-compose down
+
+clean:
+	@echo "Cleaning build artifacts..."
+	rm -rf frontend/node_modules frontend/.next frontend/out
+	rm -rf backend/venv backend/__pycache__ backend/**/__pycache__
+	rm -rf backend/.pytest_cache backend/htmlcov
+	@echo "Clean complete!"

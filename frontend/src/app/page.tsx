@@ -1,87 +1,165 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import styles from './page.module.css';
+import { api } from '@/lib/api';
 
-interface HealthResponse {
-  status: string;
-  message: string;
+interface Item {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
 }
 
 export default function Home() {
-  const [apiStatus, setApiStatus] = useState<string>('Checking...');
-  const [error, setError] = useState<string>('');
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemDescription, setNewItemDescription] = useState('');
 
   useEffect(() => {
-    const checkApiHealth = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/health`);
-        const data: HealthResponse = await response.json();
-        setApiStatus(data.message);
-      } catch (err) {
-        setError('Failed to connect to API');
-        setApiStatus('Disconnected');
-      }
-    };
-
-    checkApiHealth();
+    fetchItems();
   }, []);
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Welcome to TESTEST</h1>
-        <p className={styles.description}>
-          A full-stack application built with Next.js, Python (FastAPI), and PostgreSQL
-        </p>
+  const fetchItems = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getItems();
+      setItems(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch items. Make sure the backend is running.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        <div className={styles.statusCard}>
-          <h2>API Status</h2>
-          <p className={error ? styles.error : styles.success}>
-            {error || apiStatus}
+  const handleCreateItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemName.trim()) return;
+
+    try {
+      await api.createItem({
+        name: newItemName,
+        description: newItemDescription,
+      });
+      setNewItemName('');
+      setNewItemDescription('');
+      fetchItems();
+    } catch (err) {
+      setError('Failed to create item');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteItem = async (id: number) => {
+    try {
+      await api.deleteItem(id);
+      fetchItems();
+    } catch (err) {
+      setError('Failed to delete item');
+      console.error(err);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">TESTEST</h1>
+          <p className="text-xl text-gray-600">
+            Next.js + Python + PostgreSQL Full-Stack Application
           </p>
         </div>
 
-        <div className={styles.grid}>
-          <a
-            href="http://localhost:8000/docs"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h3>API Documentation →</h3>
-            <p>Explore the FastAPI backend endpoints</p>
-          </a>
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
+        )}
 
-          <a
-            href="https://nextjs.org/docs"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h3>Next.js Docs →</h3>
-            <p>Learn about Next.js features and API</p>
-          </a>
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Create New Item</h2>
+          <form onSubmit={handleCreateItem} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                value={newItemName}
+                onChange={e => setNewItemName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter item name"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={newItemDescription}
+                onChange={e => setNewItemDescription(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter item description"
+                rows={3}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors font-medium"
+            >
+              Create Item
+            </button>
+          </form>
+        </div>
 
-          <a
-            href="https://fastapi.tiangolo.com"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h3>FastAPI Docs →</h3>
-            <p>Discover FastAPI documentation</p>
-          </a>
-
-          <a
-            href="https://www.postgresql.org/docs"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h3>PostgreSQL Docs →</h3>
-            <p>Learn about PostgreSQL database</p>
-          </a>
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Items</h2>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <p className="mt-2 text-gray-600">Loading items...</p>
+            </div>
+          ) : items.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">
+              No items yet. Create your first item above!
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {items.map(item => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                      {item.description && (
+                        <p className="text-gray-600 mt-1">{item.description}</p>
+                      )}
+                      <p className="text-sm text-gray-400 mt-2">
+                        Created: {new Date(item.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="ml-4 text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </main>

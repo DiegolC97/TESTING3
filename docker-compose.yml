@@ -5,15 +5,15 @@ services:
     image: postgres:15-alpine
     container_name: testest_postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: testest_user
+      POSTGRES_PASSWORD: testest_password
       POSTGRES_DB: testest_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U testest_user -d testest_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,10 +24,9 @@ services:
       dockerfile: Dockerfile
     container_name: testest_backend
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/testest_db
-      SECRET_KEY: dev-secret-key-change-in-production
+      DATABASE_URL: postgresql://testest_user:testest_password@postgres:5432/testest_db
+      SECRET_KEY: your-secret-key-change-in-production
       ENVIRONMENT: development
-      CORS_ORIGINS: http://localhost:3000
     ports:
       - "8000:8000"
     depends_on:
@@ -35,7 +34,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
     build:

@@ -7,25 +7,29 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "axios": "^1.6.5"
+    "next": "14.1.0",
+    "axios": "^1.6.7",
+    "clsx": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "autoprefixer": "^10.4.17",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
     "eslint-config-prettier": "^9.1.0",
+    "postcss": "^8.4.33",
     "prettier": "^3.2.4",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   }
 }

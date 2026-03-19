@@ -1,18 +1,35 @@
 # Dependencies
 node_modules/
-venv/
-env/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+frontend/node_modules/
+backend/venv/
+backend/.venv/
+backend/env/
 
 # Environment variables
 .env
 .env.local
 .env.*.local
-*.env
+frontend/.env.local
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
 
 # IDE
 .vscode/
@@ -22,31 +39,24 @@ __pycache__/
 *~
 .DS_Store
 
-# Next.js
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/.cache/
-
-# Python
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
-.coverage
-htmlcov/
-dist/
-build/
-*.egg-info/
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Database
 *.db
+*.sqlite
 *.sqlite3
-*.log
 
 # Docker
-*.env.docker
+.dockerignore
 
-# OS
-Thumbs.db
-.DS_Store
+# Testing
+coverage/
+
+# Misc
+.turbo
+*.pem

@@ -5,24 +5,24 @@ from alembic import context
 import os
 import sys
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+# Add parent directory to path to import app modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.db.database import Base
+from app.db import models
 from app.core.config import settings
-from app.core.database import Base
-from app.models import *  # Import all models
 
 # this is the Alembic Config object
 config = context.config
 
-# Override sqlalchemy.url with our settings
+# Set the database URL from settings
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
-# Interpret the config file for Python logging
+# Interpret the config file for Python logging.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set target metadata for autogenerate support
+# Import all models here for autogenerate to work
 target_metadata = Base.metadata
 
 
@@ -49,10 +49,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

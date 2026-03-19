@@ -1,175 +1,159 @@
 # TESTEST
 
-A full-stack web application built with Next.js, Python (FastAPI), and PostgreSQL.
+A full-stack application built with Next.js, Python (FastAPI), and PostgreSQL.
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14 (React, TypeScript)
-- **Backend**: Python 3.11+ (FastAPI)
-- **Database**: PostgreSQL 15+
+- **Backend**: Python 3.11+ with FastAPI
+- **Database**: PostgreSQL
+- **Styling**: Tailwind CSS
+- **API Communication**: Axios
 - **ORM**: SQLAlchemy
-- **API Documentation**: OpenAPI (Swagger)
 
 ## Project Structure
 
 ```
 .
-├── frontend/          # Next.js application
-├── backend/           # Python FastAPI application
-├── docker-compose.yml # Docker setup for local development
-└── README.md
+├── frontend/          # Next.js frontend application
+│   ├── src/
+│   │   ├── app/      # App router pages
+│   │   ├── components/
+│   │   └── lib/      # Utilities and API client
+│   └── public/
+├── backend/          # Python FastAPI backend
+│   ├── app/
+│   │   ├── api/      # API routes
+│   │   ├── core/     # Configuration
+│   │   ├── db/       # Database models and connection
+│   │   └── schemas/  # Pydantic schemas
+│   └── tests/
+└── docker/           # Docker configuration
 ```
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 18+ and npm/yarn/pnpm
 - Python 3.11+
-- PostgreSQL 15+
-- Docker & Docker Compose (optional, for containerized setup)
+- PostgreSQL 14+
+- Docker and Docker Compose (optional)
 
-## Getting Started
+## Setup Instructions
 
-### Option 1: Docker Setup (Recommended)
+### 1. Database Setup
 
-1. Start all services:
-```bash
-docker-compose up -d
-```
+Create a PostgreSQL database:
 
-2. Access the applications:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-
-### Option 2: Manual Setup
-
-#### Database Setup
-
-1. Create a PostgreSQL database:
 ```bash
 createdb testest_db
 ```
 
-2. Update environment variables (see Configuration section)
+Or use Docker:
 
-#### Backend Setup
+```bash
+docker-compose up -d postgres
+```
 
-1. Navigate to the backend directory:
+### 2. Backend Setup
+
 ```bash
 cd backend
-```
 
-2. Create a virtual environment:
-```bash
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-3. Install dependencies:
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-4. Run database migrations:
-```bash
+# Create .env file
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Run migrations
 alembic upgrade head
-```
 
-5. Start the development server:
-```bash
+# Start development server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-#### Frontend Setup
+Backend will be available at http://localhost:8000
+API documentation at http://localhost:8000/docs
 
-1. Navigate to the frontend directory:
+### 3. Frontend Setup
+
 ```bash
 cd frontend
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Start the development server:
-```bash
+# Create .env.local file
+cp .env.example .env.local
+
+# Start development server
 npm run dev
 ```
 
-## Configuration
-
-### Backend Environment Variables
-
-Create a `.env` file in the `backend` directory:
-
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/testest_db
-SECRET_KEY=your-secret-key-here
-ENVIRONMENT=development
-CORS_ORIGINS=http://localhost:3000
-```
-
-### Frontend Environment Variables
-
-Create a `.env.local` file in the `frontend` directory:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+Frontend will be available at http://localhost:3000
 
 ## Development
 
+### Running with Docker
+
+```bash
+docker-compose up
+```
+
+This will start all services (frontend, backend, and database).
+
+### Database Migrations
+
+```bash
+cd backend
+
+# Create a new migration
+alembic revision --autogenerate -m "description"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback
+alembic downgrade -1
+```
+
 ### Running Tests
 
-Backend:
+Backend tests:
 ```bash
 cd backend
 pytest
 ```
 
-Frontend:
+Frontend tests:
 ```bash
 cd frontend
 npm test
 ```
 
-### Code Formatting
+## Environment Variables
 
-Backend:
-```bash
-cd backend
-black .
-isort .
-```
+### Backend (.env)
+- `DATABASE_URL`: PostgreSQL connection string
+- `SECRET_KEY`: JWT secret key
+- `ENVIRONMENT`: development/production
 
-Frontend:
-```bash
-cd frontend
-npm run lint
-npm run format
-```
+### Frontend (.env.local)
+- `NEXT_PUBLIC_API_URL`: Backend API URL
 
-## Production Build
+## API Endpoints
 
-### Frontend
-```bash
-cd frontend
-npm run build
-npm start
-```
-
-### Backend
-```bash
-cd backend
-gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
-```
-
-## API Documentation
-
-Once the backend is running, visit:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- `GET /api/health` - Health check
+- `GET /api/v1/items` - List items
+- `POST /api/v1/items` - Create item
+- `GET /api/v1/items/{id}` - Get item by ID
+- `PUT /api/v1/items/{id}` - Update item
+- `DELETE /api/v1/items/{id}` - Delete item
 
 ## License
 

@@ -6,7 +6,6 @@ from typing import Optional
 class ItemBase(BaseModel):
     name: str
     description: Optional[str] = None
-    is_active: bool = True
 
 
 class ItemCreate(ItemBase):
@@ -16,12 +15,15 @@ class ItemCreate(ItemBase):
 class ItemUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    is_active: Optional[bool] = None
 
 
-class Item(ItemBase):
+class ItemInDB(ItemBase):
     id: int
     created_at: datetime
-    updated_at: Optional[datetime] = None
-
+    updated_at: datetime
+    
     model_config = ConfigDict(from_attributes=True)
+
+
+class Item(ItemInDB):
+    pass
